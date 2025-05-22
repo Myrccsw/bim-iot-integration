@@ -1,0 +1,685 @@
+[
+    {
+        "id": "bd75c48b8264560b",
+        "type": "tab",
+        "label": "Json_List",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "4aa16badca2b59ad",
+        "type": "http in",
+        "z": "bd75c48b8264560b",
+        "name": "http end-point /x",
+        "url": "/x",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 620,
+        "y": 380,
+        "wires": [
+            [
+                "1d044a8fbbe78e06"
+            ]
+        ]
+    },
+    {
+        "id": "1d695dc200f45c85",
+        "type": "http response",
+        "z": "bd75c48b8264560b",
+        "name": "http response",
+        "statusCode": "",
+        "headers": {},
+        "x": 980,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "1d044a8fbbe78e06",
+        "type": "template",
+        "z": "bd75c48b8264560b",
+        "name": "x (HTML)",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>BIMxIoT Dash</title>\n    <meta charset=\"utf-8\" />\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />\n\n    <!-- Three.js and OrbitControls -->\n    <script src=\"https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js\"></script>\n    <script src=\"https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/OrbitControls.js\"></script>\n\n    <!-- jQuery -->\n    <script src=\"https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js\"></script>\n\n    <!-- Chart.js v3.9.1 -->\n    <script src=\"https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js\"></script>\n    <!-- Chart.js Matrix Plugin v2.0.0 (UMD) -->\n    <script src=\"https://unpkg.com/chartjs-chart-matrix@2.0.0/dist/chartjs-chart-matrix.js\"></script>\n\n    <style>\n      /* =============== GENERAL LAYOUT =============== */\n      html, body {\n        margin: 0;\n        padding: 0;\n        background: #F6F4F0;\n        font-family: 'Monofur', monospace;\n        margin: 0 auto;\n        height: 100%;\n        overflow: hidden;\n      }\n      #banner {\n        width: 100%;\n        background: linear-gradient(to right, #2E5077, #79D7BE);\n        color: #79D7BE;\n        font-style: italic;\n        padding: 10px;\n        font-size: 35px;\n      }\n      #sub-banner {\n        width: 100%;\n        background: linear-gradient(to right, #4DA1A9, #79D7BE);\n        color: #2E5077;\n        font-size: 12px;\n        padding: 2px 10px;\n        font-style: italic;\n      }\n\n      #logo-container {\n        position: absolute;\n        top: 10px;\n        right: -135px;\n        z-index: 9999;\n      }\n      #logo-img {\n        width: 50%;\n        opacity: 1;\n      }\n\n      /* Dashboard: IFC + Sensor Tables */\n      #dashboard {\n        position: absolute;\n        top: 80px;\n        left: 0;\n        bottom: 0;\n        width: 20%;\n        background: linear-gradient(to right, #4DA1A9, #79D7BE);\n        color: #2E5077;\n        opacity: 1;\n        padding: 5px;\n        box-sizing: border-box;\n        font-size: 10px;\n      }\n\n      /* IFC property container (blue box area) */\n      #ifcProperties {\n        max-height: 350px; /* or adjust as needed */\n        overflow-y: auto;\n        margin-bottom: 5px;\n      }\n\n      #dashboard table {\n        width: 100%;\n        border-collapse: collapse;\n        table-layout: fixed;\n      }\n      #dashboard th, #dashboard td {\n        border: 1px solid #79D7BE;\n        padding: 3px;\n        text-align: left;\n        background-color: #F6F4F0;\n        opacity: 0.8;\n        word-wrap: break-word;\n      }\n      #dashboard th {\n        color: #2E5077;\n        background: #C7EAE3;\n      }\n      #table-sensor tbody tr td:nth-child(2) {\n        font-weight: bold;\n      }\n\n      /* 3D VIEWER */\n      #div3d-container {\n        position: absolute;\n        top: 80px;\n        left: 20%;\n        right: 0;\n        bottom: 0;\n        overflow: hidden;\n        box-sizing: border-box;\n      }\n      #div3d {\n        width: 100%;\n        height: 100%;\n      }\n\n      /* Bottom charts: Sensor Chart + Heatmap */\n      #bottom-charts {\n        position: absolute;\n        left: 20%;\n        right: 0;\n        bottom: 0;\n        height: 30%;\n        display: flex;\n        flex-direction: row;\n        box-sizing: border-box;\n        background: linear-gradient(to top, #D0DDD0, rgba(113, 187, 178, 0));\n      }\n      #sensor-chart-container {\n        flex: 70%;\n        display: flex;\n        align-items: center;\n        justify-content: center;\n        padding: 5px;\n      }\n      #sensorChart {\n        width: 100%;\n        height: 100% !important;\n      }\n      #heatmap-chart-container {\n        flex: 21.5%;\n        display: flex;\n        align-items: center;\n        justify-content: center;\n        padding: 15px;\n        box-sizing: border-box;\n      }\n      #correlationHeatmap {\n        width: 100%;\n        height: 100% !important;\n      }\n\n      /* Scrollbar customization for IFC properties */\n      #ifcProperties::-webkit-scrollbar {\n        width: 10px;\n      }\n      #ifcProperties::-webkit-scrollbar-track {\n        background: #C7EAE3;\n      }\n      #ifcProperties::-webkit-scrollbar-thumb {\n        background-color: #2E5077;\n        border-radius: 5px;\n        border: 2px solid #C7EAE3;\n      }\n\n      #ifcProperties {\n        scrollbar-width: thin;\n        scrollbar-color: #2E5077 #C7EAE3;\n      }\n    </style>\n  </head>\n\n  <body>\n    <div id=\"logo-container\">\n      <img\n        id=\"logo-img\"\n        src=\"https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/%E6%9D%B1%E4%BA%AC%E9%83%BD%E7%AB%8B%E5%A4%A7%E5%AD%A6%E3%83%AD%E3%82%B4.svg/320px-%E6%9D%B1%E4%BA%AC%E9%83%BD%E7%AB%8B%E5%A4%A7%E5%AD%A6%E3%83%AD%E3%82%B4.svg.png\"\n        alt=\"Tokyo Metropolitan University Logo\"\n      />\n    </div>\n\n    <div id=\"banner\">BIMxIoT Dash</div>\n    <div id=\"sub-banner\">Prototype of BIM and IoT Integration Using Open Standards</div>\n\n    <!-- LEFT TABLES: IFC + Sensor -->\n    <div id=\"dashboard\">\n      <!-- IFC property table (blue box) -->\n      <div id=\"ifcProperties\">\n        <table id=\"table-ui\">\n          <thead>\n            <tr>\n              <th>Property</th>\n              <th>Value</th>\n            </tr>\n          </thead>\n          <tbody>\n            <!-- Basic IFC Info -->\n            <tr><td>globalId</td><td id=\"prop-globalId\">-</td></tr>\n            <tr><td>longName</td><td id=\"prop-longName\">-</td></tr>\n            <tr><td>Name</td><td id=\"prop-name\">-</td></tr>\n            <tr><td>IFC Type</td><td id=\"prop-type\">-</td></tr>\n            <tr><td>Width</td><td id=\"prop-width\">-</td></tr>\n            <tr><td>Height</td><td id=\"prop-height\">-</td></tr>\n            <tr><td>Perimeter</td><td id=\"prop-perimeter\">-</td></tr>\n            <tr><td>Level (Story)</td><td id=\"prop-level\">-</td></tr>\n            <tr><td>Area</td><td id=\"prop-area\">-</td></tr>\n            <tr><td>Volume</td><td id=\"prop-volume\">-</td></tr>\n            <tr><td>IFC PredefinedType</td><td id=\"prop-predefinedType\">-</td></tr>\n            <tr><td>IFC CompositionType</td><td id=\"prop-compositionType\">-</td></tr>\n            <tr><td>IFC DocumentReference</td><td id=\"prop-IfcDocumentReference\">-</td></tr>\n\n            <!-- Pset: Manufacturer, etc. -->\n            <tr><td>Manufacturer</td><td id=\"prop-manufacturer\">-</td></tr>\n            <tr><td>Model Number</td><td id=\"prop-modelNumber\">-</td></tr>\n            <tr><td>Serial Number</td><td id=\"prop-serialNumber\">-</td></tr>\n            <tr><td>Warranty Start</td><td id=\"prop-warrantyStart\">-</td></tr>\n            <tr><td>Warranty End</td><td id=\"prop-warrantyEnd\">-</td></tr>\n\n            <!-- More Pset Data -->\n            <tr><td>Service Life</td><td id=\"prop-serviceLife\">-</td></tr>\n            <tr><td>Maintenance Frequency</td><td id=\"prop-maintenanceFrequency\">-</td></tr>\n            <tr><td>Asset Tag</td><td id=\"prop-assetTag\">-</td></tr>\n            <tr><td>Current Condition</td><td id=\"prop-condition\">-</td></tr>\n          </tbody>\n        </table>\n      </div>\n\n      <!-- SENSOR TABLE (red box) -->\n      <br />\n      <table id=\"table-sensor\">\n        <thead>\n          <tr><th>Sensor Property</th><th>Value</th></tr>\n        </thead>\n        <tbody>\n          <tr><td>CO₂ Level</td><td id=\"sensor-co2\">-</td></tr>\n          <tr><td>Occupancy</td><td id=\"sensor-people\">-</td></tr>\n          <tr><td>Temperature</td><td id=\"sensor-temperature\">-</td></tr>\n          <tr><td>Humidity</td><td id=\"sensor-humidity\">-</td></tr>\n          <tr><td>Last Updated</td><td id=\"sensor-timestamp\">-</td></tr>\n        </tbody>\n      </table>\n    </div>\n\n    <!-- The 3D Viewer -->\n    <div id=\"div3d-container\">\n      <div id=\"div3d\"></div>\n    </div>\n\n    <!-- Bottom charts: Sensor + Heatmap -->\n    <div id=\"bottom-charts\">\n      <div id=\"sensor-chart-container\">\n        <canvas id=\"sensorChart\"></canvas>\n      </div>\n      <div id=\"heatmap-chart-container\">\n        <canvas id=\"correlationHeatmap\"></canvas>\n      </div>\n    </div>\n\n\n    <script>\n      /* ------------------------------------------------------------\n         WEBSOCKET SETUP\n         ------------------------------------------------------------ */\n      var socket1 = new WebSocket('ws://localhost:1880/ws/receiveMessage');\n      var socket2 = new WebSocket('ws://localhost:1880/ws/sendMessage');\n      var socket1Opened = false;\n      socket1.onopen = function() {\n        socket1Opened = true;\n        var message = { payload: 'Client connected' };\n        socket1.send(JSON.stringify(message));\n      };\n      socket2.onopen = function() {\n        var message = { payload: 'Client connected' };\n        socket2.send(JSON.stringify(message));\n      };\n      socket2.onclose = function() { console.log('Connection closed'); };\n      socket2.onerror = function(error) { console.log('Error detected: ' + JSON.stringify(error)); };\n      socket2.onmessage = function(e) {\n        var server_message = e.data;\n        let responseObject = JSON.parse(server_message);\n        console.log('got message');\n        processData(responseObject);\n      };\n\n      // Additional sockets for color updates\n      var socket3 = new WebSocket('ws://localhost:1880/ws/receiveMessage2');\n      var socket4 = new WebSocket('ws://localhost:1880/ws/sendMessage2');\n      socket3.onopen = function() {\n        socket3.send(JSON.stringify({ payload: 'Client connected to 2- receive' }));\n      };\n      socket4.onopen = function() {\n        socket4.send(JSON.stringify({ payload: 'Client connected 2 - send' }));\n      };\n      socket4.onclose = function() {\n        console.log('Connection closed 2 - send');\n      };\n      socket4.onerror = function(error) {\n        console.log('Error detected -2 send: ' + JSON.stringify(error));\n      };\n      socket4.onmessage = function(e) {\n        let responseObject = JSON.parse(e.data);\n        if (responseObject.data) processData2(responseObject.data);\n      };\n\n      var socket5 = new WebSocket('ws://localhost:1880/ws/receiveMessage3');\n      var socket6 = new WebSocket('ws://localhost:1880/ws/sendMessage3');\n      socket5.onopen = function() {\n        socket5.send(JSON.stringify({ payload: 'Client connected to 5- receive' }));\n      };\n      socket6.onmessage = function(e) {\n        let responseObject = JSON.parse(e.data);\n        try {\n          if (responseObject.data) {\n            B = [];\n            responseObject.data.forEach(elem => {\n              B.push(elem);\n            });\n            updateObjects();\n          }\n        } catch (err) {\n          console.error(err);\n        }\n      };\n\n      /* ------------------------------------------------------------\n         3D SCENE SETUP\n         ------------------------------------------------------------ */\n      let scene3d, camera3d, renderer3d, controls3d, raycaster;\n      let ObjArr = [];\n      let B = [];\n      let mouse = new THREE.Vector2();\n      let colorInpObj = [];\n\n      function updateObjects() {\n        B.forEach(e => {\n          let gId = e.globalId.toString();\n          for (let i = 0; i < ObjArr.length; i++) {\n            if (ObjArr[i].globalId.toString() === gId) {\n              if (e.color) ObjArr[i].color = parseInt(e.color, 16);\n              if (e.opacity) ObjArr[i].opacity = e.opacity;\n              if (e.hidden) ObjArr[i].hidden = e.hidden;\n            }\n          }\n        });\n        ObjArr.forEach(e => {\n          if (e.hidden === true) {\n            e.mesh.geometry.dispose();\n            e.mesh.material.dispose();\n            scene3d.remove(e.mesh);\n          }\n        });\n      }\n      function processData2(x) {\n        colorInpObj = [...x];\n      }\n\n      // This function processes geometry + pset data from the server\n      function processData(objDataArrInp) {\n        console.log('processData', objDataArrInp);\n        // Remove old geometry\n        ObjArr.forEach(obj => {\n          if (scene3d.getObjectById(obj.mesh.id)) {\n            scene3d.remove(obj.mesh);\n            obj.mesh.geometry.dispose();\n            obj.mesh.material.dispose();\n          }\n          if (obj.wireframe) {\n            scene3d.remove(obj.wireframe);\n          }\n        });\n        ObjArr = [];\n\n        if (!objDataArrInp) return;\n        let obj_color = 0xB0B0B0;\n        let obj_opacity = 1.0;\n\n        // Suppose objDataArrInp.data is an array: [ { id, points, type, quantityData, psetData, ... }, ... ]\n        objDataArrInp.data.forEach(obj => {\n          let points = obj.points || [];\n          const vector3Array = points.map(point => new THREE.Vector3(point[0], point[1], point[2]));\n          let material = new THREE.MeshPhongMaterial({\n            color: obj_color,\n            shininess: 50,\n            opacity: obj_opacity,\n            transparent: true\n          });\n          let geometry = new THREE.BufferGeometry();\n          geometry.setFromPoints(vector3Array);\n          geometry.computeVertexNormals();\n          let mesh = new THREE.Mesh(geometry, material);\n          mesh.frustumCulled = false;\n          mesh.castShadow = true;\n          mesh.receiveShadow = true;\n          scene3d.add(mesh);\n\n          let edgeGeometry = new THREE.EdgesGeometry(geometry);\n          let edgeMaterial = new THREE.LineBasicMaterial({ color: 0x2E5077 });\n          let wireframe = new THREE.LineSegments(edgeGeometry, edgeMaterial);\n          scene3d.add(wireframe);\n\n          ObjArr.push({\n            obj: obj, // contains IFC + pset + quantity data\n            mesh: mesh,\n            wireframe: wireframe,\n            globalId: obj.id,\n            type: obj.type,\n            IfcDocumentReference: obj.IfcDocumentReference,\n            selected: false,\n            color: obj_color,\n            opacity: obj_opacity,\n            hidden: false\n          });\n        });\n        render();\n      }\n\n      function resetView() {\n        camera3d.position.set(20, 20, 20);\n        controls3d.target.set(0, 0, 0);\n        controls3d.update();\n      }\n\n      function init() {\n        scene3d = new THREE.Scene();\n        scene3d.background = new THREE.Color(0xF6F4F0);\n        camera3d = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 10000);\n        camera3d.up = new THREE.Vector3(0,0,1);\n        camera3d.position.set(20,20,20);\n\n        renderer3d = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });\n        renderer3d.setPixelRatio(window.devicePixelRatio);\n        renderer3d.shadowMap.enabled = true;\n        renderer3d.shadowMap.type = THREE.PCFSoftShadowMap;\n\n        const div3d = document.getElementById('div3d');\n        renderer3d.setSize(div3d.clientWidth, div3d.clientHeight);\n        div3d.appendChild(renderer3d.domElement);\n\n        raycaster = new THREE.Raycaster();\n\n        controls3d = new THREE.OrbitControls(camera3d, renderer3d.domElement);\n        controls3d.enableDamping = true;\n        controls3d.dampingFactor = 0.05;\n        controls3d.addEventListener('change', render);\n\n        let ambientLight = new THREE.AmbientLight(0xffffff, 0.5);\n        scene3d.add(ambientLight);\n\n        let directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);\n        directionalLight.position.set(30,10,10);\n        scene3d.add(directionalLight);\n\n        scene3d.add(new THREE.AxesHelper(10));\n\n        document.addEventListener('mousedown', onMouseDown, false);\n        document.addEventListener('dblclick', onDoubleClick, false);\n        window.addEventListener('resize', onWindowResize, false);\n\n        render();\n      }\n\n      function onWindowResize() {\n        const div3d = document.getElementById('div3d');\n        camera3d.aspect = div3d.clientWidth/div3d.clientHeight;\n        camera3d.updateProjectionMatrix();\n        renderer3d.setSize(div3d.clientWidth, div3d.clientHeight);\n      }\n\n      function onDoubleClick(event) {\n        mouse.x = (event.clientX/window.innerWidth)*2 - 1;\n        mouse.y = -(event.clientY/window.innerHeight)*2 + 1;\n        raycaster.setFromCamera(mouse, camera3d);\n        let intersects = raycaster.intersectObjects(ObjArr.map(e => e.mesh), true);\n        if(intersects.length===0){\n          resetView();\n        }\n      }\n\n      let currentGlobalId = null;\n      let chartDataMap = {};\n\n      function onMouseDown(e) {\n        mouse.x = (e.clientX/window.innerWidth)*2 - 1;\n        mouse.y = -(e.clientY/window.innerHeight)*2 + 1;\n        raycaster.setFromCamera(mouse, camera3d);\n        let intersects = raycaster.intersectObjects(ObjArr.map(e=>e.mesh), true);\n\n        if(intersects.length>0){\n          let clickedMesh = intersects[0].object;\n          let clickedObj = ObjArr.find(el=>el.mesh===clickedMesh);\n          ObjArr.forEach(obj=>obj.selected=false);\n          if(clickedObj){\n            clickedObj.selected = true;\n          }\n        } else {\n          ObjArr.forEach(obj=>obj.selected=false);\n        }\n\n        // Highlight the selection\n        ObjArr.forEach(item=>{\n          if(item.selected){\n            item.mesh.material.color.setHex(0xffdb5c);\n            item.mesh.material.opacity=0.9;\n            if(item.wireframe) item.wireframe.visible=false;\n          } else {\n            item.mesh.material.color.setHex(item.color);\n            item.mesh.material.opacity=0.9;\n            if(item.wireframe) item.wireframe.visible=true;\n          }\n          item.mesh.material.needsUpdate = true;\n        });\n\n        let selectedObj = ObjArr.find(e=>e.selected);\n        if(selectedObj){\n          updateDashboard(selectedObj.globalId);\n          setCurrentGlobalId(selectedObj.globalId);\n        } else {\n          updateDashboard(null);\n          setCurrentGlobalId(null);\n        }\n      }\n\n      function render(){\n        requestAnimationFrame(render);\n        renderer3d.render(scene3d, camera3d);\n      }\n\n      function setCurrentGlobalId(gid){\n        currentGlobalId = gid;\n        if(!gid){\n          // Clear sensor/heatmap charts if no object selected\n          sensorChart.data.labels = [];\n          sensorChart.data.datasets.forEach(ds=>ds.data=[]);\n          sensorChart.update();\n\n          heatmapChart.data.datasets[0].data = [];\n          heatmapChart.update();\n          return;\n        }\n        if(chartDataMap[gid]){\n          loadChartFromMap(gid);\n          updateCorrelationHeatmap(chartDataMap[gid]);\n        } else {\n          sensorChart.data.labels = [];\n          sensorChart.data.datasets.forEach(ds=>ds.data=[]);\n          sensorChart.update();\n          heatmapChart.data.datasets[0].data = [];\n          heatmapChart.update();\n        }\n      }\n\n      //===================== Chart Data =====================//\n      function loadChartFromMap(gid){\n        let objData = chartDataMap[gid];\n        sensorChart.data.labels = [...objData.labels];\n        sensorChart.data.datasets[0].data = [...objData.co2];\n        sensorChart.data.datasets[1].data = [...objData.people];\n        sensorChart.data.datasets[2].data = [...objData.temperature];\n        sensorChart.data.datasets[3].data = [...objData.humidity];\n        sensorChart.update();\n      }\n\n      // Helper to choose between possible keys (e.g. IFC might define \"Height\" vs \"height\")\n      function pickQuantity(qData, names) {\n        // names = array of possible keys\n        for(let i=0; i<names.length; i++) {\n          let key = names[i];\n          if(qData.hasOwnProperty(key)) {\n            return qData[key];\n          }\n        }\n        return null;\n      }\n\n      /* ===============================================\n         UPDATE DASHBOARD with IFC, Pset & Dimension data\n         ===============================================*/\n      function updateDashboard(globalId){\n        // Clear main IFC fields\n        document.getElementById(\"prop-globalId\").textContent = \"-\";\n        document.getElementById(\"prop-longName\").textContent = \"-\";\n        document.getElementById(\"prop-name\").textContent = \"-\";\n        document.getElementById(\"prop-type\").textContent = \"-\";\n        document.getElementById(\"prop-predefinedType\").textContent = \"-\";\n        document.getElementById(\"prop-compositionType\").textContent = \"-\";\n        document.getElementById(\"prop-IfcDocumentReference\").textContent = \"-\";\n\n        // Clear manufacturer/pset\n        document.getElementById(\"prop-manufacturer\").textContent = \"-\";\n        document.getElementById(\"prop-modelNumber\").textContent = \"-\";\n        document.getElementById(\"prop-serialNumber\").textContent = \"-\";\n        document.getElementById(\"prop-warrantyStart\").textContent = \"-\";\n        document.getElementById(\"prop-warrantyEnd\").textContent = \"-\";\n\n        // Clear geometry/quantity fields\n        document.getElementById(\"prop-width\").textContent = \"-\";\n        document.getElementById(\"prop-height\").textContent = \"-\";\n        document.getElementById(\"prop-perimeter\").textContent = \"-\";\n        document.getElementById(\"prop-level\").textContent = \"-\";\n        document.getElementById(\"prop-area\").textContent = \"-\";\n        document.getElementById(\"prop-volume\").textContent = \"-\";\n\n        // Clear other pset fields\n        document.getElementById(\"prop-serviceLife\").textContent = \"-\";\n        document.getElementById(\"prop-maintenanceFrequency\").textContent = \"-\";\n        document.getElementById(\"prop-assetTag\").textContent = \"-\";\n        document.getElementById(\"prop-condition\").textContent = \"-\";\n\n        // Clear sensor data\n        document.getElementById(\"sensor-co2\").textContent = \"-\";\n        document.getElementById(\"sensor-people\").textContent = \"-\";\n        document.getElementById(\"sensor-temperature\").textContent = \"-\";\n        document.getElementById(\"sensor-humidity\").textContent = \"-\";\n        document.getElementById(\"sensor-timestamp\").textContent = \"-\";\n\n        if(!globalId) return; // No selection\n\n        let selectedObj = ObjArr.find(e=>e.globalId.toString()===globalId.toString());\n        if(!selectedObj) return;\n\n        // Basic IFC properties\n        document.getElementById(\"prop-globalId\").textContent = selectedObj.globalId || \"-\";\n        document.getElementById(\"prop-longName\").textContent = selectedObj.obj.longName || \"-\";\n        document.getElementById(\"prop-name\").textContent = selectedObj.obj.name || \"-\";\n        document.getElementById(\"prop-type\").textContent = selectedObj.type || \"-\";\n        document.getElementById(\"prop-predefinedType\").textContent = selectedObj.obj.predefinedType || \"-\";\n        document.getElementById(\"prop-compositionType\").textContent = selectedObj.obj.compositionType || \"-\";\n        document.getElementById(\"prop-IfcDocumentReference\").textContent = selectedObj.IfcDocumentReference || \"-\";\n\n        // If data is available in psetData or quantityData...\n        let psetData = selectedObj.obj.psetData || {};\n        let qData    = selectedObj.obj.quantityData || {};\n\n        // Log so we can see if \"perimeter\" actually exists in qData\n        console.log(\"qData for this element:\", qData);\n\n        // Fill manufacturer/pset\n        let manuOcc = psetData.manufacturerOccurrence || {};\n        document.getElementById(\"prop-manufacturer\").textContent = manuOcc.Manufacturer || \"-\";\n        document.getElementById(\"prop-modelNumber\").textContent   = manuOcc.ModelNumber || \"-\";\n        document.getElementById(\"prop-serialNumber\").textContent  = manuOcc.SerialNumber || \"-\";\n        document.getElementById(\"prop-warrantyStart\").textContent = manuOcc.WarrantyStart || \"-\";\n        document.getElementById(\"prop-warrantyEnd\").textContent   = manuOcc.WarrantyEnd || \"-\";\n\n        // Because IFC quantity sets might name them differently (\"Height\" vs \"height\", etc.)\n        let widthVal     = pickQuantity(qData, [\"width\", \"Width\"]);\n        let heightVal    = pickQuantity(qData, [\"height\", \"Height\"]);\n        // We added more fallback keys for perimeter\n        let perimeterVal = pickQuantity(qData, [\"perimeter\", \"Perimeter\", \"GrossPerimeter\", \"NetPerimeter\", \"BaseQuantities::Perimeter\"]);\n        let areaVal      = pickQuantity(qData, [\"area\", \"GrossFloorArea\", \"NetFloorArea\"]);\n        let volumeVal    = pickQuantity(qData, [\"volume\", \"GrossVolume\", \"NetVolume\"]);\n        let levelName    = qData.levelName || \"-\";\n\n        document.getElementById(\"prop-width\").textContent     = widthVal     ? widthVal + \" m\" : \"-\";\n        document.getElementById(\"prop-height\").textContent    = heightVal    ? heightVal + \" m\" : \"-\";\n        document.getElementById(\"prop-perimeter\").textContent = perimeterVal ? perimeterVal + \" m\" : \"-\";\n        document.getElementById(\"prop-level\").textContent     = levelName;\n        document.getElementById(\"prop-area\").textContent      = areaVal      ? areaVal + \" m²\" : \"-\";\n        document.getElementById(\"prop-volume\").textContent    = volumeVal    ? volumeVal + \" m³\" : \"-\";\n\n        // More pset data\n        let serviceLife = psetData.serviceLife || {};\n        document.getElementById(\"prop-serviceLife\").textContent = serviceLife.Duration || \"-\";\n\n        let maintenance = psetData.maintenanceStrategy || {};\n        document.getElementById(\"prop-maintenanceFrequency\").textContent = maintenance.Frequency || \"-\";\n\n        let asset = psetData.asset || {};\n        document.getElementById(\"prop-assetTag\").textContent = asset.AssetTag || \"-\";\n\n        let condition = psetData.condition || {};\n        document.getElementById(\"prop-condition\").textContent = condition.CurrentCondition || \"-\";\n      }\n\n      init();\n    </script>\n\n    <!-- CHART + Real-Time Sensor -->\n    <script>\n      // Setup Chart.js fonts\n      Chart.defaults.font.size = 8;\n      Chart.defaults.color = '#333';\n\n      //================= Sensor Chart =================//\n      var ctx = document.getElementById('sensorChart').getContext('2d');\n      var sensorChart = new Chart(ctx, {\n        type: 'line',\n        data: {\n          labels: [],\n          datasets: [\n            {\n              label: 'CO₂ (ppm)',\n              data: [],\n              borderColor: 'rgb(255, 99, 132)',\n              fill: false,\n              borderWidth: 1.5,\n              pointRadius: 2,\n              pointHoverRadius: 3,\n              yAxisID: 'yCO2'\n            },\n            {\n              label: 'Occupancy (avg)',\n              data: [],\n              borderColor: 'rgb(54, 162, 235)',\n              fill: false,\n              borderWidth: 1.5,\n              pointRadius: 2,\n              pointHoverRadius: 3,\n              yAxisID: 'yOther'\n            },\n            {\n              label: 'Temperature (°C)',\n              data: [],\n              borderColor: 'rgb(255, 159, 64)',\n              fill: false,\n              borderWidth: 1.5,\n              pointRadius: 2,\n              pointHoverRadius: 3,\n              yAxisID: 'yOther'\n            },\n            {\n              label: 'Humidity (%)',\n              data: [],\n              borderColor: 'rgb(153, 102, 255)',\n              fill: false,\n              borderWidth: 1.5,\n              pointRadius: 2,\n              pointHoverRadius: 3,\n              yAxisID: 'yOther'\n            }\n          ]\n        },\n        options: {\n          responsive: true,\n          maintainAspectRatio: false,\n          layout: { padding: { right: 0 } },\n          plugins: {\n            legend: {\n              labels: { font: { size: 8 } }\n            }\n          },\n          scales: {\n            x: {\n              title: { display: true, text: 'Timestamp (Raw CSV)' },\n              ticks: {\n                autoSkip: true,\n                maxTicksLimit: 5,\n                font: { size: 8 },\n                maxRotation: 0,\n                minRotation: 0\n              }\n            },\n            yCO2: {\n              type: 'linear',\n              position: 'left',\n              title: { display: true, text: 'CO2' },\n              ticks: { font: { size: 8 } }\n            },\n            yOther: {\n              type: 'linear',\n              position: 'right',\n              title: { display: true, text: 'People / Temp / Humid' },\n              ticks: { font: { size: 8 } },\n              grid: { drawOnChartArea: false }\n            }\n          }\n        }\n      });\n\n      // Match table colors to chart\n      document.getElementById(\"sensor-co2\").style.color       = sensorChart.data.datasets[0].borderColor;\n      document.getElementById(\"sensor-people\").style.color    = sensorChart.data.datasets[1].borderColor;\n      document.getElementById(\"sensor-temperature\").style.color = sensorChart.data.datasets[2].borderColor;\n      document.getElementById(\"sensor-humidity\").style.color  = sensorChart.data.datasets[3].borderColor;\n\n      //================= Heatmap (Correlation) =================//\n      const colorbarPlugin = {\n        id: 'colorbar',\n        beforeDraw(chart) {\n          const {\n            ctx,\n            chartArea: { top, bottom, left, right, width, height }\n          } = chart;\n          let dataset = chart.data.datasets[0].data;\n          if(!dataset || dataset.length === 0) return;\n\n          let values = dataset.map(d=>d.v);\n          let minVal = Math.min(...values);\n          let maxVal = Math.max(...values);\n\n          let grad = ctx.createLinearGradient(right+15, top, right+15, bottom);\n          grad.addColorStop(0, getColor(maxVal, minVal, maxVal));\n          grad.addColorStop(1, getColor(minVal, minVal, maxVal));\n\n          const barW = 10;\n          ctx.fillStyle = grad;\n          ctx.fillRect(right+10, top, barW, height);\n\n          ctx.fillStyle='#000';\n          ctx.textAlign='left';\n          ctx.font='8px monospace';\n          for(let i=0; i<=5; i++){\n            let val = minVal + ((maxVal - minVal)*i/5);\n            let yPos = bottom - (height*(i/5));\n            ctx.fillText(val.toFixed(2), right+barW+15, yPos);\n          }\n        }\n      };\n\n      function getColor(value, minVal, maxVal) {\n        let ratio = (value - minVal)/(maxVal - minVal || 1);\n        let startColor = [46, 80, 119];   // #2E5077\n        let endColor   = [121, 215, 190]; // #79D7BE\n        let r = Math.round(startColor[0] + (endColor[0] - startColor[0])*ratio);\n        let g = Math.round(startColor[1] + (endColor[1] - startColor[1])*ratio);\n        let b = Math.round(startColor[2] + (endColor[2] - startColor[2])*ratio);\n        return `rgb(${r},${g},${b})`;\n      }\n\n      const ctxHeatmap = document.getElementById('correlationHeatmap').getContext('2d');\n      const heatmapChart = new Chart(ctxHeatmap, {\n        type: 'matrix',\n        data: {\n            datasets: [{\n                label: 'Sensor Correlation',\n                data: [],\n                borderWidth: 0,\n                backgroundColor: (ctx) => {\n                    let d = ctx.dataset.data[ctx.dataIndex];\n                    let dataset = ctx.chart.data.datasets[0].data;\n                    if(!dataset || dataset.length===0) return '#ccc';\n                    let values = dataset.map(x=>x.v);\n                    let minV = Math.min(...values);\n                    let maxV = Math.max(...values);\n                    return getColor(d.v, minV, maxV);\n                },\n                width: 44,\n                height: 40\n            }]\n        },\n        plugins: [colorbarPlugin],\n        options: {\n            responsive: true,\n            maintainAspectRatio: false,\n            layout: { padding: 0 },\n            scales: {\n                x: {\n                    type: 'category',\n                    labels: ['CO2','Occupancy','Temp','Humidity'],\n                    position: 'top',\n                    offset: true,\n                    grid: { display: false },\n                    ticks: { maxRotation: 0, minRotation: 0 }\n                },\n                y: {\n                    type: 'category',\n                    labels: ['CO2','Occupancy','Temp','Humidity'],\n                    reverse: true,\n                    offset: true,\n                    grid: { display: false },\n                    ticks: { maxRotation: 0, minRotation: 0 }\n                }\n            },\n            plugins: {\n                legend: { display: false },\n                tooltip: {\n                    callbacks: {\n                        title: () => '',\n                        label: (ctx) => {\n                            let d = ctx.dataset.data[ctx.dataIndex];\n                            return `${d.x} vs ${d.y}: ${d.v.toFixed(2)}`;\n                        }\n                    }\n                }\n            }\n        }\n      });\n\n      function correlationCoefficient(arrX, arrY){\n        if(!arrX || !arrY) return 0;\n        let n = Math.min(arrX.length, arrY.length);\n        if(n < 2) return 0;\n        let sumX=0, sumY=0, sumXY=0, sumX2=0, sumY2=0;\n        for(let i=0; i<n; i++){\n          let x=arrX[i];\n          let y=arrY[i];\n          sumX += x;\n          sumY += y;\n          sumXY += x*y;\n          sumX2 += x*x;\n          sumY2 += y*y;\n        }\n        let numerator = n*sumXY - sumX*sumY;\n        let denominator = Math.sqrt((n*sumX2 - sumX*sumX)*(n*sumY2 - sumY*sumY));\n        if(denominator===0) return 0;\n        return numerator/denominator;\n      }\n\n      function updateCorrelationHeatmap(storage){\n        let co2Arr   = storage.co2 || [];\n        let occArr   = storage.people || [];\n        let tempArr  = storage.temperature || [];\n        let humidArr = storage.humidity || [];\n\n        let c_co2_co2  = correlationCoefficient(co2Arr, co2Arr);\n        let c_co2_occ  = correlationCoefficient(co2Arr, occArr);\n        let c_co2_temp = correlationCoefficient(co2Arr, tempArr);\n        let c_co2_hum  = correlationCoefficient(co2Arr, humidArr);\n\n        let c_occ_co2  = correlationCoefficient(occArr, co2Arr);\n        let c_occ_occ  = correlationCoefficient(occArr, occArr);\n        let c_occ_temp = correlationCoefficient(occArr, tempArr);\n        let c_occ_hum  = correlationCoefficient(occArr, humidArr);\n\n        let c_temp_co2  = correlationCoefficient(tempArr, co2Arr);\n        let c_temp_occ  = correlationCoefficient(tempArr, occArr);\n        let c_temp_temp = correlationCoefficient(tempArr, tempArr);\n        let c_temp_hum  = correlationCoefficient(tempArr, humidArr);\n\n        let c_hum_co2   = correlationCoefficient(humidArr, co2Arr);\n        let c_hum_occ   = correlationCoefficient(humidArr, occArr);\n        let c_hum_temp  = correlationCoefficient(humidArr, tempArr);\n        let c_hum_hum   = correlationCoefficient(humidArr, humidArr);\n\n        heatmapChart.data.datasets[0].data = [\n          { x:'CO2',       y:'CO2',       v:c_co2_co2 },\n          { x:'CO2',       y:'Occupancy', v:c_co2_occ },\n          { x:'CO2',       y:'Temp',      v:c_co2_temp },\n          { x:'CO2',       y:'Humidity',  v:c_co2_hum },\n\n          { x:'Occupancy', y:'CO2',       v:c_occ_co2 },\n          { x:'Occupancy', y:'Occupancy', v:c_occ_occ },\n          { x:'Occupancy', y:'Temp',      v:c_occ_temp },\n          { x:'Occupancy', y:'Humidity',  v:c_occ_hum },\n\n          { x:'Temp',      y:'CO2',       v:c_temp_co2 },\n          { x:'Temp',      y:'Occupancy', v:c_temp_occ },\n          { x:'Temp',      y:'Temp',      v:c_temp_temp },\n          { x:'Temp',      y:'Humidity',  v:c_temp_hum },\n\n          { x:'Humidity',  y:'CO2',       v:c_hum_co2 },\n          { x:'Humidity',  y:'Occupancy', v:c_hum_occ },\n          { x:'Humidity',  y:'Temp',      v:c_hum_temp },\n          { x:'Humidity',  y:'Humidity',  v:c_hum_hum }\n        ];\n        heatmapChart.update();\n      }\n\n      //================= WebSocket รับ CSV Streaming (Sensor) =================//\n      var sensorSocket = new WebSocket(\"ws://localhost:1880/ws/receiveMessage\");\n      sensorSocket.onmessage = function(event){\n        var dataText = event.data;\n        var data = JSON.parse(dataText);\n        if(!data || !data.timestamp || !data.globalId) return;\n\n        // Create a storage object for each globalId if not existing\n        if(!chartDataMap[data.globalId]){\n          chartDataMap[data.globalId] = {\n            labels: [],\n            co2: [],\n            people: [],\n            temperature: [],\n            humidity: []\n          };\n        }\n        var storage = chartDataMap[data.globalId];\n\n        // Push new sensor data (timestamp, co2, etc.)\n        storage.labels.push(data.timestamp);\n        storage.co2.push(data.co2_level || 0);\n        storage.people.push(data.people_count || 0);\n        storage.temperature.push(data.temperature || 0);\n        storage.humidity.push(data.humidity || 0);\n\n        // Limit to 30 data points\n        while(storage.labels.length > 30){\n          storage.labels.shift();\n          storage.co2.shift();\n          storage.people.shift();\n          storage.temperature.shift();\n          storage.humidity.shift();\n        }\n\n        // If this is the currently selected object, update the sensor table & charts\n        if(data.globalId === currentGlobalId){\n          document.getElementById(\"sensor-co2\").textContent        = data.co2_level;\n          document.getElementById(\"sensor-people\").textContent     = data.people_count;\n          document.getElementById(\"sensor-temperature\").textContent= data.temperature;\n          document.getElementById(\"sensor-humidity\").textContent   = data.humidity;\n          document.getElementById(\"sensor-timestamp\").textContent  = data.timestamp;\n\n          loadChartFromMap(data.globalId);\n          updateCorrelationHeatmap(storage);\n        }\n      };\n    </script>\n  </body>\n</html>\n",
+        "output": "str",
+        "x": 800,
+        "y": 380,
+        "wires": [
+            [
+                "1d695dc200f45c85"
+            ]
+        ]
+    },
+    {
+        "id": "a330dbcb52a4a88e",
+        "type": "inject",
+        "z": "bd75c48b8264560b",
+        "name": "start:",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"data\":[{\"type\":\"Door\",\"color\":\"0xfa9301\",\"opacity\":0.5},{\"type\":\"Slab\",\"color\":\"0xf9a8c3\",\"opacity\":0.5},{\"type\":\"WallStandardCase\",\"color\":\"0x000eff\",\"opacity\":0.15},{\"type\":\"Window\",\"color\":\"0xf100e4\",\"opacity\":0.5},{\"type\":\"Space\",\"color\":\"0x1232dd\",\"opacity\":0.15},{\"type\":\"Footing\",\"color\":\"0x000000\",\"opacity\":0.5}]}",
+        "payloadType": "json",
+        "x": 450,
+        "y": 380,
+        "wires": [
+            [
+                "1d044a8fbbe78e06",
+                "24f1e084e7139ab4"
+            ]
+        ]
+    },
+    {
+        "id": "24f1e084e7139ab4",
+        "type": "file in",
+        "z": "bd75c48b8264560b",
+        "name": "File JSON",
+        "filename": "C:\\Users\\Lenovo\\Desktop\\Experimental\\json_listData",
+        "filenameType": "str",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 490,
+        "y": 440,
+        "wires": [
+            [
+                "11cc7018e5cd2df2"
+            ]
+        ]
+    },
+    {
+        "id": "11cc7018e5cd2df2",
+        "type": "json",
+        "z": "bd75c48b8264560b",
+        "name": "To Obj",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 630,
+        "y": 440,
+        "wires": [
+            [
+                "a6ed56d09f887fc8"
+            ]
+        ]
+    },
+    {
+        "id": "a6ed56d09f887fc8",
+        "type": "function",
+        "z": "bd75c48b8264560b",
+        "name": "Preparing Data",
+        "func": "// ตัวอย่าง: แปลง JSON เป็นโครงสร้างที่ต้องการ\nvar data = msg.payload.data;\nmsg.topic = \"go\";\n// เก็บเป็น msg.ifcData เพื่อส่งไป MongoDB\nmsg.ifcData = data;\n\nmsg.payload = { data: data };\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 780,
+        "y": 440,
+        "wires": [
+            [
+                "4bdd4c7175ca5db8",
+                "dfcb070095494b14",
+                "f11331d2af5d934a"
+            ]
+        ]
+    },
+    {
+        "id": "4bdd4c7175ca5db8",
+        "type": "websocket out",
+        "z": "bd75c48b8264560b",
+        "name": "websocket: send",
+        "server": "9ccee2bd.8fa7a",
+        "client": "",
+        "x": 1010,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "dfcb070095494b14",
+        "type": "debug",
+        "z": "bd75c48b8264560b",
+        "name": "debug 8",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 980,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "f0c5c54a7a124b05",
+        "type": "websocket in",
+        "z": "bd75c48b8264560b",
+        "name": "websocket: receive",
+        "server": "ws-config-bim",
+        "client": "",
+        "x": 770,
+        "y": 500,
+        "wires": [
+            [
+                "3b4acb0128c3c5a9",
+                "4bdd4c7175ca5db8"
+            ]
+        ]
+    },
+    {
+        "id": "3b4acb0128c3c5a9",
+        "type": "debug",
+        "z": "bd75c48b8264560b",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 990,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "cd773bd665ee4d06",
+        "type": "http in",
+        "z": "bd75c48b8264560b",
+        "name": "GET /get_sensor_data",
+        "url": "/get_sensor_data",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 240,
+        "y": 200,
+        "wires": [
+            [
+                "11b0506dd8d67e72"
+            ]
+        ]
+    },
+    {
+        "id": "7507a456336ceae9",
+        "type": "http response",
+        "z": "bd75c48b8264560b",
+        "name": "http response JSON",
+        "statusCode": "200",
+        "headers": {},
+        "x": 660,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "11b0506dd8d67e72",
+        "type": "function",
+        "z": "bd75c48b8264560b",
+        "name": "Fetch Sensor Data",
+        "func": "// Example: GET /get_sensor_data?globalId=123\n// We'll just retrieve the most recent reading for that globalId.\n\nvar gId = msg.req.query.globalId;\nvar sensorDataArr = global.get(\"sensorData\") || [];\n\nif(!gId) {\n    msg.payload = { space_id: \"N/A\", co2_level: \"N/A\", people_count: \"N/A\", timestamp: \"N/A\" };\n    return msg;\n}\n\nvar matches = sensorDataArr.filter(d => d.globalId === gId);\nif(matches.length > 0) {\n    let last = matches[matches.length-1];\n    msg.payload = {\n      space_id: last.space_id || \"N/A\",\n      co2_level: last.co2_level,\n      people_count: last.people_count,\n      temperature: last.temperature,\n      humidity: last.humidity,\n      timestamp: last.timestamp\n    };\n} else {\n    msg.payload = { space_id: \"N/A\", co2_level: \"N/A\", people_count: \"N/A\", timestamp: \"N/A\" };\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 450,
+        "y": 200,
+        "wires": [
+            [
+                "7507a456336ceae9"
+            ]
+        ]
+    },
+    {
+        "id": "70d5d47ebe403451",
+        "type": "inject",
+        "z": "bd75c48b8264560b",
+        "name": "Inject: read CSV IoT",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 320,
+        "y": 240,
+        "wires": [
+            [
+                "785479f102c5d8f5"
+            ]
+        ]
+    },
+    {
+        "id": "785479f102c5d8f5",
+        "type": "file in",
+        "z": "bd75c48b8264560b",
+        "name": "IoT data CSV",
+        "filename": "C:\\Users\\Lenovo\\Desktop\\Experimental\\IoT_Data.csv",
+        "filenameType": "str",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "none",
+        "allProps": false,
+        "x": 520,
+        "y": 240,
+        "wires": [
+            [
+                "03fdbecede6f5fb5"
+            ]
+        ]
+    },
+    {
+        "id": "03fdbecede6f5fb5",
+        "type": "csv",
+        "z": "bd75c48b8264560b",
+        "name": "Parse CSV",
+        "sep": ",",
+        "hdrin": true,
+        "hdrout": "none",
+        "multi": "one",
+        "ret": "one",
+        "temp": "",
+        "skip": "0",
+        "strings": true,
+        "x": 690,
+        "y": 240,
+        "wires": [
+            [
+                "2a814b0c162c0118",
+                "0ec61ee350de661c",
+                "4603a62af19de466"
+            ]
+        ]
+    },
+    {
+        "id": "2a814b0c162c0118",
+        "type": "function",
+        "z": "bd75c48b8264560b",
+        "name": "function 2 -> JSON string",
+        "func": "// Each CSV row => { globalId, space_id, co2_level, ...}\n// Turn into JSON string to send over MQTT\nvar row = msg.payload;\nif(!row.globalId) { return null; }\nvar sensorData = {\n    globalId: row.globalId.toString(),\n    space_id: row.space_id || \"-\",\n    co2_level: parseFloat(row.co2_level) || 0,\n    people_count: parseInt(row.people_count, 10) || 0,\n    temperature: parseFloat(row.temperature) || 0,\n    humidity: parseFloat(row.humidity) || 0,\n    timestamp: row.timestamp\n};\nmsg.payload = JSON.stringify(sensorData);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 930,
+        "y": 240,
+        "wires": [
+            [
+                "2e62a97ffe43bcdd"
+            ]
+        ]
+    },
+    {
+        "id": "0ec61ee350de661c",
+        "type": "function",
+        "z": "bd75c48b8264560b",
+        "name": "Store to global sensorData",
+        "func": "var row = msg.payload;\nif (!row.globalId) { return null; }\nvar sensorData = global.get(\"sensorData\") || [];\nsensorData.push({\n    globalId: row.globalId.toString(),\n    space_id: row.space_id,\n    co2_level: parseFloat(row.co2_level) || 0,\n    people_count: parseFloat(row.people_count) || 0,\n    temperature: parseFloat(row.temperature) || 0,\n    humidity: parseFloat(row.humidity) || 0,\n    timestamp: row.timestamp\n});\nif (sensorData.length > 200) { sensorData.shift(); }\nglobal.set(\"sensorData\", sensorData);\n\n// สร้าง msg.mongoSensor เก็บข้อมูลพร้อม insert\n// กรณีต้องการเก็บลง MongoDB\nmsg.mongoSensor = {\n    globalId: row.globalId.toString(),\n    timestamp: row.timestamp,\n    co2_level: parseFloat(row.co2_level) || 0,\n    people_count: parseFloat(row.people_count) || 0,\n    temperature: parseFloat(row.temperature) || 0,\n    humidity: parseFloat(row.humidity) || 0\n};\n\nreturn msg;",
+        "outputs": 2,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 940,
+        "y": 320,
+        "wires": [
+            [
+                "489d194b6dda4c0b",
+                "c2e81e88b2ea806d",
+                "4e4315a8190ec929"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "4603a62af19de466",
+        "type": "delay",
+        "z": "bd75c48b8264560b",
+        "name": "Delay each row",
+        "pauseType": "rate",
+        "timeout": "10",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "5",
+        "rateUnits": "second",
+        "randomFirst": "0",
+        "randomLast": "0",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 680,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "489d194b6dda4c0b",
+        "type": "debug",
+        "z": "bd75c48b8264560b",
+        "name": "debug to see chart data",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1270,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "306f58891c2fa326",
+        "type": "websocket out",
+        "z": "bd75c48b8264560b",
+        "name": "Send CSV data -> /ws/receiveMessage",
+        "server": "ws-config-bim",
+        "client": "",
+        "x": 1180,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "adeae60af28117d8",
+        "type": "mqtt in",
+        "z": "bd75c48b8264560b",
+        "name": "AWS IoT MQTT In",
+        "topic": "my/topic",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "9a9acc2bfdbccaa8",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 910,
+        "y": 180,
+        "wires": [
+            [
+                "306f58891c2fa326"
+            ]
+        ]
+    },
+    {
+        "id": "2e62a97ffe43bcdd",
+        "type": "mqtt out",
+        "z": "bd75c48b8264560b",
+        "name": "AWS IoT MQTT Out",
+        "topic": "my/topic",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "9a9acc2bfdbccaa8",
+        "x": 1160,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "ef6af917a7bd3c1b",
+        "type": "mqtt in",
+        "z": "bd75c48b8264560b",
+        "name": "Subscribe from AWS IoT",
+        "topic": "my/topic",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "awsBrokerConfig",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 930,
+        "y": 120,
+        "wires": [
+            [
+                "9b0ff1c6e77c8ca7"
+            ]
+        ]
+    },
+    {
+        "id": "9b0ff1c6e77c8ca7",
+        "type": "debug",
+        "z": "bd75c48b8264560b",
+        "name": "Show payload",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1140,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "c2e81e88b2ea806d",
+        "type": "ui_chart",
+        "z": "bd75c48b8264560b",
+        "name": "CO2 x Occupancy chart (Dashboard)",
+        "group": "d6e29f3e3cb239cf",
+        "order": 0,
+        "width": "6",
+        "height": "4",
+        "label": "CO2 x Occupancy",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1310,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f11331d2af5d934a",
+        "type": "mongodb out",
+        "z": "bd75c48b8264560b",
+        "mongodb": "mongo-config",
+        "name": "MongoDB IFC",
+        "collection": "ifcData",
+        "payonly": false,
+        "upsert": false,
+        "multi": false,
+        "operation": "insert",
+        "x": 1200,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "4e4315a8190ec929",
+        "type": "mongodb out",
+        "z": "bd75c48b8264560b",
+        "mongodb": "mongo-config",
+        "name": "MongoDB Sensor",
+        "collection": "sensorData",
+        "payonly": false,
+        "upsert": false,
+        "multi": false,
+        "operation": "insert",
+        "x": 1210,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "9ccee2bd.8fa7a",
+        "type": "websocket-listener",
+        "path": "/ws/sendMessage",
+        "wholemsg": "false"
+    },
+    {
+        "id": "ws-config-bim",
+        "type": "websocket-listener",
+        "path": "/ws/receiveMessage",
+        "wholemsg": "false"
+    },
+    {
+        "id": "9a9acc2bfdbccaa8",
+        "type": "mqtt-broker",
+        "name": "AWS IoT Core Broker",
+        "broker": "a246erpnoi3b7d-ats.iot.us-east-1.amazonaws.com",
+        "port": "8883",
+        "tls": "11f7e4fca1ae7836",
+        "clientid": "NodeREDTestClient1",
+        "autoConnect": true,
+        "usetls": true,
+        "compatmode": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "awsBrokerConfig",
+        "type": "mqtt-broker",
+        "name": "AWS IoT Core Broker",
+        "broker": "a246erpnoi3b7d-ats.iot.us-east-1.amazonaws.com",
+        "port": "8883",
+        "tls": "myTLSConfig",
+        "clientid": "NodeREDTestClient",
+        "autoConnect": true,
+        "usetls": true,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "d6e29f3e3cb239cf",
+        "type": "ui_group",
+        "name": "Sensor Data",
+        "tab": "7913fbda46d7a581",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "mongo-config",
+        "type": "mongodb",
+        "hostname": "cluster0.8gejub2.mongodb.net",
+        "topology": "dnscluster",
+        "connectOptions": "",
+        "port": "27017",
+        "db": "BIMIoT_DB",
+        "name": ""
+    },
+    {
+        "id": "11f7e4fca1ae7836",
+        "type": "tls-config",
+        "name": "AWS IoT TLS",
+        "cert": "",
+        "key": "",
+        "ca": "",
+        "certname": "d6cd4cbbb52fac606fe885886a1c247efcb0050e2adb0abf4a9ade290793adc4-certificate.pem.crt",
+        "keyname": "d6cd4cbbb52fac606fe885886a1c247efcb0050e2adb0abf4a9ade290793adc4-private.pem.key",
+        "caname": "",
+        "servername": "",
+        "verifyservercert": true,
+        "alpnprotocol": ""
+    },
+    {
+        "id": "myTLSConfig",
+        "type": "tls-config",
+        "name": "AWS IoT TLS",
+        "cert": "C:\\\\Users\\\\Lenovo\\\\Downloads\\New folder (5)\\\\d6cd4cbbb52fac606fe885886a1c247efcb0050e2adb0abf4a9ade290793adc4-certificate.pem.crt",
+        "key": "C:\\\\Users\\\\Lenovo\\\\Downloads\\New folder (5)\\\\d6cd4cbbb52fac606fe885886a1c247efcb0050e2adb0abf4a9ade290793adc4-private.pem.key",
+        "ca": "C:\\\\Users\\\\Lenovo\\\\Downloads\\New folder (5)\\\\AmazonRootCA1 (2).pem",
+        "certname": "",
+        "keyname": "",
+        "caname": "",
+        "servername": "",
+        "verifyservercert": true,
+        "alpnprotocol": ""
+    },
+    {
+        "id": "7913fbda46d7a581",
+        "type": "ui_tab",
+        "name": "Dashboard",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
