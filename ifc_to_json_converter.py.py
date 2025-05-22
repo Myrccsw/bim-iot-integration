@@ -6,7 +6,7 @@ import os
 from ifcopenshell import geom
 
 # Define output directory
-output_directory = r"C:\Users\Lenovo\Desktop\Experimental"
+output_directory = r"C:\Users\xxx"
 
 # Ensure the directory exists
 os.makedirs(output_directory, exist_ok=True)
@@ -15,7 +15,7 @@ os.makedirs(output_directory, exist_ok=True)
 output_file_path = os.path.join(output_directory, "json_listData.json")
 
 # Load your IFC file
-ifc_file = ifcopenshell.open(r"C:\Users\Lenovo\Desktop\Experimental\1Co-Working area.ifc")
+ifc_file = ifcopenshell.open(r"C:\Users\xxx.ifc")
 
 ### JSON DATA IN LIST ###
 settings = geom.settings(
